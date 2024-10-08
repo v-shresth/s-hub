@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "cms/pb";
+
+import "google/protobuf/empty.proto";
+import "record_service.proto";
+
+service SchemaService {
+  rpc CreateSchema(CreateSchemaRequest) returns (google.protobuf.Empty);
+  rpc ListSchemas(ListSchemasRequest) returns (ListSchemasResponse);
+  rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
+  rpc DropSchema(DropSchemaRequest) returns (google.protobuf.Empty);
+}
+
+message CreateSchemaRequest {
+  string schema_name = 1;
+  repeated Field fields = 2;
+}
+
+message Field {
+  string name = 1;
+  Type type = 2;        // The type of the field
+  int32 length = 3;     // Length for types like VARCHAR or CHAR
+  int32 precision = 4;  // Precision for NUMERIC types
+  int32 scale = 5;      // Scale for NUMERIC types
+}
+
+enum Type {
+  TYPE_VARCHAR = 0;
+  TYPE_CHAR = 1;
+  TYPE_TEXT = 2;
+  TYPE_INTEGER = 3;
+  TYPE_BIGINT = 4;
+  TYPE_SMALLINT = 5;
+  TYPE_BOOLEAN = 6;
+  TYPE_DATE = 7;
+  TYPE_TIMESTAMP = 8;
+  TYPE_NUMERIC = 9;
+}
+
+message ListSchemasRequest {}
+
+message ListSchemasResponse {
+  int32 total_schemas = 1;
+  repeated SchemaDetail schemas = 2;
+}
+
+message SchemaDetail {
+  string schema_name = 1;
+  int32 no_of_fields = 2;
+}
+
+message GetSchemaRequest {
+  string schema_name = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message GetSchemaResponse {
+  repeated Field fields = 1;
+  repeated Record records = 2;
+}
+
+message DropSchemaRequest {
+  string schema_name = 1;
+}

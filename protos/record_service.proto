@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "cms/pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
+service RecordService {
+  rpc CreateRecord(CreateRecordRequest) returns (Record);
+  rpc GetRecord(GetRecordRequest) returns (Record);
+  rpc DeleteRecord(DeleteRecordRequest) returns (google.protobuf.Empty);
+  rpc UpdateRecord(UpdateRecordRequest) returns (Record);
+}
+
+message CreateRecordRequest {
+  string schema_name = 2;
+  repeated Record records = 3;
+}
+
+message Record {
+  map<string, Value> values = 1;
+}
+
+message Value {
+  oneof value {
+    string varchar_value = 1;     // For VARCHAR(n)
+    string char_value = 2;         // For CHAR(n)
+    string text_value = 3;       // For string values (TEXT, VARCHAR, CHAR)
+    int32 int_value = 4;           // For integer values (INTEGER)
+    int64 bigint_value = 5;          // For larger integer values (BIGINT)
+    int32 smallint_value = 6;          // For larger integer values (BIGINT)
+    bool bool_value = 7;           // For boolean values (BOOLEAN)
+    google.protobuf.Timestamp date_value = 8;  // For timestamp values (DATE)
+    google.protobuf.Timestamp timestamp_value = 9;  // For timestamp values (TIMESTAMP)
+    float numeric_value = 10;     // For NUMERIC (with precision and scale)
+  }
+}
+
+message GetRecordRequest {
+  string schema_name = 1;
+  int32 record_id = 2;
+}
+
+message DeleteRecordRequest {
+  string schema_name = 1;
+  int32 record_id = 2;
+}
+
+message UpdateRecordRequest {
+  int32 record_id = 1;
+  string schema_name = 2;
+  Record record = 3;
+  google.protobuf.FieldMask field_mask = 4;
+}
