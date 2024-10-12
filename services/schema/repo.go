@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"cms/clients"
 	"cms/models"
 	"cms/utils"
 	"cms/utils/constants"
@@ -11,14 +12,16 @@ import (
 )
 
 type repo struct {
-	db  *gorm.DB
-	log utils.Logger
+	userDb *gorm.DB
+	log    clients.Logger
+	config clients.Config
 }
 
-func newRepo(db *gorm.DB, log utils.Logger) *repo {
+func newRepo(userDb *gorm.DB, log clients.Logger, config clients.Config) *repo {
 	return &repo{
-		db:  db,
-		log: log,
+		userDb: userDb,
+		log:    log,
+		config: config,
 	}
 }
 
@@ -62,7 +65,7 @@ func (r *repo) createSchema(
 }
 
 func (r *repo) withTransaction(f func(db *gorm.DB) error) error {
-	return utils.WithTransaction(r.db, func(tx *gorm.DB) error {
+	return utils.WithTransaction(r.userDb, func(tx *gorm.DB) error {
 		return f(tx)
 	})
 }
@@ -81,7 +84,7 @@ func (r *repo) listSchemas(
 					FROM table_counts`, constants.MetadataSchema, constants.MetadataSchema)
 
 	var schemaDetails []models.SchemaDetail
-	err := r.db.Debug().WithContext(ctx).Raw(SQL).Scan(&schemaDetails).Error
+	err := r.userDb.Debug().WithContext(ctx).Raw(SQL).Scan(&schemaDetails).Error
 	if err != nil {
 		return nil, fmt.Errorf("error querying table and field counts: %v", err)
 	}

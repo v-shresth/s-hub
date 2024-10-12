@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cms/controller"
-	"cms/utils"
+	"cms/clients"
+	"cms/server"
 	"fmt"
 	"net"
 	"os"
@@ -10,15 +10,15 @@ import (
 )
 
 func main() {
-	log := utils.NewLogger()
-	config, err := utils.NewConfig()
+	log := clients.NewLogger()
+	config, err := clients.NewConfig()
 	if err != nil {
 		log.WithError(err).Error("unable to load env")
 		return
 	}
-	db := utils.ConnectDB(log, config)
+	systemDB := clients.GetSystemDB(log, config)
 
-	grpcServer := controller.NewServer(db, log)
+	grpcServer := server.NewServer(systemDB, log, config)
 
 	lis, err := net.Listen("tcp", config.GetPort())
 	if err != nil {

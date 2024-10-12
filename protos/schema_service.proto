@@ -17,6 +17,12 @@ service SchemaService {
 message CreateSchemaRequest {
   string schema_name = 1;
   repeated Field fields = 2;
+  repeated Index indexes = 4;  // Allow the definition of indexes
+}
+
+message Index {
+  repeated string columns = 1;  // List of columns involved in the index
+  bool is_unique = 2;           // Unique index or not
 }
 
 message Field {
@@ -25,6 +31,15 @@ message Field {
   int32 length = 3;     // Length for types like VARCHAR or CHAR
   int32 precision = 4;  // Precision for NUMERIC types
   int32 scale = 5;      // Scale for NUMERIC types
+  ForeignKey foreign_key = 6;  // Optional foreign key definition
+  oneof default_value {// Default value must match the type or be NULL
+    string string_value = 7;
+    int32 int_value = 8;
+    bool bool_value = 9;
+    float float_value = 10;
+    bool default_null = 11;     // Explicitly set default to NULL
+  }
+  repeated Constraint constraints = 12;  // Constraint type (fixed options)
 }
 
 enum Type {
@@ -38,6 +53,26 @@ enum Type {
   TYPE_DATE = 7;
   TYPE_TIMESTAMP = 8;
   TYPE_NUMERIC = 9;
+}
+
+message ForeignKey {
+  string reference_table = 1;  // The referenced table name
+  string reference_column = 2; // The referenced column name
+  ForeignKeyAction on_delete = 5;
+  ForeignKeyAction on_update = 6;
+}
+
+enum ForeignKeyAction {
+  NO_ACTION = 0;
+  CASCADE = 1;
+  SET_NULL = 2;
+}
+
+message Constraint {
+  bool is_nullable = 1;
+  bool is_unique = 2;
+  bool is_not_null = 3;
+  string check_expression = 4;  // To specify check conditions
 }
 
 message ListSchemasRequest {}

@@ -1,6 +1,7 @@
 package record
 
 import (
+	"cms/clients"
 	"cms/models"
 	"cms/pb"
 	"cms/services"
@@ -12,16 +13,16 @@ import (
 )
 
 type svc struct {
-	log         utils.Logger
+	log         clients.Logger
 	repo        *repo
 	internalSvc services.InternalService
 }
 
-func NewRecordService(log utils.Logger, db *gorm.DB) services.RecordService {
+func NewRecordService(log clients.Logger, userDb *gorm.DB, config clients.Config) services.RecordService {
 	return &svc{
 		log:         log,
-		repo:        newRepo(db, log),
-		internalSvc: internal.NewInternalService(log, db),
+		repo:        newRepo(userDb, log, config),
+		internalSvc: internal.NewInternalService(log, userDb, config),
 	}
 }
 
@@ -43,6 +44,9 @@ func (s *svc) CreateRecord(
 	}
 
 	dbRecords, err := s.repo.createRecord(ctx, metaData[0].SystemSchemaName, records)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	return metaData, dbRecords, err
 }
@@ -112,5 +116,5 @@ func (s *svc) UpdateRecord(
 
 	err = s.repo.updateRecord(ctx, metaData[0].SystemSchemaName, int(req.RecordId), records[0])
 
-	return metaData, records[0], err
+	return s.GetRecord(ctx, req.SchemaName, int(req.RecordId))
 }

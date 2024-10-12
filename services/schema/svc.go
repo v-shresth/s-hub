@@ -1,29 +1,29 @@
 package schema
 
 import (
+	"cms/clients"
 	"cms/models"
 	"cms/services"
 	"cms/services/internal"
 	"cms/services/record"
-	"cms/utils"
 	"context"
 	"fmt"
 	"gorm.io/gorm"
 )
 
 type svc struct {
-	log         utils.Logger
+	log         clients.Logger
 	repo        *repo
 	recordSvc   services.RecordService
 	internalSvc services.InternalService
 }
 
-func NewSchemaService(log utils.Logger, db *gorm.DB) services.SchemaService {
+func NewSchemaService(log clients.Logger, userDb *gorm.DB, config clients.Config) services.SchemaService {
 	return &svc{
 		log:         log,
-		repo:        newRepo(db, log),
-		recordSvc:   record.NewRecordService(log, db),
-		internalSvc: internal.NewInternalService(log, db),
+		repo:        newRepo(userDb, log, config),
+		recordSvc:   record.NewRecordService(log, userDb, config),
+		internalSvc: internal.NewInternalService(log, userDb, config),
 	}
 }
 

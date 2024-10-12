@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"cms/pb"
@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *server) CreateRecord(
+func (s *Server) CreateRecord(
 	ctx context.Context, req *pb.CreateRecordRequest,
 ) (*pb.Record, error) {
 	err := utils.ValidateCreateRecordRequest(req)
@@ -17,7 +17,7 @@ func (s *server) CreateRecord(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	metaData, records, err := s.recordSvc.CreateRecord(ctx, req)
+	metaData, records, err := s.RecordSvc.CreateRecord(ctx, req)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -30,7 +30,7 @@ func (s *server) CreateRecord(
 	return resp[0], nil
 }
 
-func (s *server) GetRecord(
+func (s *Server) GetRecord(
 	ctx context.Context, req *pb.GetRecordRequest,
 ) (*pb.Record, error) {
 	err := utils.ValidateGetRecordRequest(req)
@@ -38,7 +38,7 @@ func (s *server) GetRecord(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	metaData, record, err := s.recordSvc.GetRecord(ctx, req.SchemaName, int(req.RecordId))
+	metaData, record, err := s.RecordSvc.GetRecord(ctx, req.SchemaName, int(req.RecordId))
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -51,7 +51,7 @@ func (s *server) GetRecord(
 	return resp[0], nil
 }
 
-func (s *server) DeleteRecord(
+func (s *Server) DeleteRecord(
 	ctx context.Context, req *pb.DeleteRecordRequest,
 ) (*emptypb.Empty, error) {
 	err := utils.ValidateDeleteRecordRequest(req)
@@ -59,7 +59,7 @@ func (s *server) DeleteRecord(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	err = s.recordSvc.DeleteRecord(ctx, req.SchemaName, int(req.RecordId))
+	err = s.RecordSvc.DeleteRecord(ctx, req.SchemaName, int(req.RecordId))
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -67,7 +67,7 @@ func (s *server) DeleteRecord(
 	return nil, nil
 }
 
-func (s *server) UpdateRecord(
+func (s *Server) UpdateRecord(
 	ctx context.Context, req *pb.UpdateRecordRequest,
 ) (*pb.Record, error) {
 	err := utils.ValidateUpdateRecordRequest(req)
@@ -75,7 +75,7 @@ func (s *server) UpdateRecord(
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	metaData, record, err := s.recordSvc.UpdateRecord(ctx, req)
+	metaData, record, err := s.RecordSvc.UpdateRecord(ctx, req)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}

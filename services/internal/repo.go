@@ -1,8 +1,8 @@
 package internal
 
 import (
+	"cms/clients"
 	"cms/models"
-	"cms/utils"
 	"cms/utils/constants"
 	"context"
 	"fmt"
@@ -10,14 +10,16 @@ import (
 )
 
 type repo struct {
-	db  *gorm.DB
-	log utils.Logger
+	log    clients.Logger
+	config clients.Config
+	userDb *gorm.DB
 }
 
-func newRepo(db *gorm.DB, log utils.Logger) *repo {
+func newRepo(userDb *gorm.DB, log clients.Logger, config clients.Config) *repo {
 	return &repo{
-		db:  db,
-		log: log,
+		log:    log,
+		config: config,
+		userDb: userDb,
 	}
 }
 
@@ -27,7 +29,7 @@ func (r *repo) fetchMetaDataInfo(ctx context.Context, schemaName string, isSyste
 		matchWithTableField = "display_schema_name"
 	}
 	var metaData []models.SchemaMetaData
-	err := r.db.Debug().WithContext(ctx).Table(constants.MetadataSchema).
+	err := r.userDb.Debug().WithContext(ctx).Table(constants.MetadataSchema).
 		Select("id, system_schema_name, display_schema_name, system_field_name, display_field_name, display_field_type").
 		Where(fmt.Sprintf("%s = ? AND deleted_at IS NULL", matchWithTableField), schemaName).Scan(&metaData).Error
 	if err != nil {

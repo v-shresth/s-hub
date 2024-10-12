@@ -1,22 +1,22 @@
 package internal
 
 import (
+	"cms/clients"
 	"cms/models"
 	"cms/services"
-	"cms/utils"
 	"context"
 	"gorm.io/gorm"
 )
 
 type svc struct {
-	log  utils.Logger
+	log  clients.Logger
 	repo *repo
 }
 
-func NewInternalService(log utils.Logger, db *gorm.DB) services.InternalService {
+func NewInternalService(log clients.Logger, userDb *gorm.DB, config clients.Config) services.InternalService {
 	return &svc{
 		log:  log,
-		repo: newRepo(db, log),
+		repo: newRepo(userDb, log, config),
 	}
 }
 

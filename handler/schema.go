@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"cms/pb"
@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *server) CreateSchema(
+func (s *Server) CreateSchema(
 	ctx context.Context, req *pb.CreateSchemaRequest,
 ) (*emptypb.Empty, error) {
 	schemaName := req.SchemaName
@@ -24,7 +24,7 @@ func (s *server) CreateSchema(
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	userSchemaName, err := s.schemaSvc.CreateSchema(ctx, schema, metaData)
+	userSchemaName, err := s.SchemaSvc.CreateSchema(ctx, schema, metaData)
 	if err != nil {
 		if schemaName != "" {
 			if schemaName == userSchemaName {
@@ -39,10 +39,10 @@ func (s *server) CreateSchema(
 	return nil, nil
 }
 
-func (s *server) ListSchemas(
+func (s *Server) ListSchemas(
 	ctx context.Context, req *pb.ListSchemasRequest,
 ) (*pb.ListSchemasResponse, error) {
-	schemas, err := s.schemaSvc.ListSchemas(ctx)
+	schemas, err := s.SchemaSvc.ListSchemas(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
@@ -60,7 +60,7 @@ func (s *server) ListSchemas(
 	return resp, nil
 }
 
-func (s *server) GetSchema(
+func (s *Server) GetSchema(
 	ctx context.Context, req *pb.GetSchemaRequest,
 ) (*pb.GetSchemaResponse, error) {
 	filter, err := utils.ValidateGetSchemaRequest(req)
@@ -68,7 +68,7 @@ func (s *server) GetSchema(
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	resp, err := s.schemaSvc.GetSchema(ctx, req.SchemaName, filter)
+	resp, err := s.SchemaSvc.GetSchema(ctx, req.SchemaName, filter)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
@@ -81,7 +81,7 @@ func (s *server) GetSchema(
 	return apiResp, nil
 }
 
-func (s *server) DropSchema(
+func (s *Server) DropSchema(
 	ctx context.Context, req *pb.DropSchemaRequest,
 ) (*emptypb.Empty, error) {
 	err := utils.ValidateDropSchemaRequest(req)
@@ -89,7 +89,7 @@ func (s *server) DropSchema(
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	err = s.schemaSvc.DropSchema(ctx, req.SchemaName)
+	err = s.SchemaSvc.DropSchema(ctx, req.SchemaName)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

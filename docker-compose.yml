@@ -9,4 +9,14 @@ services:
     environment:
       - POSTGRES_USER=local
       - POSTGRES_PASSWORD=local
-      - POSTGRES_DB=cms
+      - POSTGRES_DB=system
+  db1:
+    image: "postgres:13"
+    ports:
+      - "5436:5432"
+    volumes:
+      - ./pgdata1:/var/lib/postgresql/data1
+    environment:
+      - POSTGRES_USER=local
+      - POSTGRES_PASSWORD=local
+      - POSTGRES_DB=user

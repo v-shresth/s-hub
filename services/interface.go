@@ -24,3 +24,10 @@ type RecordService interface {
 type InternalService interface {
 	FetchMetaData(ctx context.Context, schemaName string, isSystemName bool) ([]models.SchemaMetaData, error)
 }
+
+type UserService interface {
+	FindUserSession(ctx context.Context, sessionId uint) (models.Session, error)
+	Register(ctx context.Context, dbUser models.Users) (*models.Users, error)
+	Login(ctx context.Context, email, password string) (*models.Token, error)
+	Logout(ctx context.Context, sessionId uint) error
+}
